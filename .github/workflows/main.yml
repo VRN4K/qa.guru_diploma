@@ -1,5 +1,5 @@
 # название workflow
-name: AcademyBugs test
+name: QA.GURU diploma workflow
 
 on:
   # стандартный запуск
