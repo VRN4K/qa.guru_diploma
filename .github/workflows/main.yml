@@ -1,0 +1,100 @@
+# название workflow
+name: QA.GURU diploma workflow
+
+on:
+  # стандартный запуск
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+  # ручной запуск
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pages:   write
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      # Получаем код
+      - uses: actions/checkout@v4
+
+        # Устанавливаем Node.js
+      - uses: actions/setup-node@v4
+        with:
+          node-version: lts/*
+
+        # Устанавливаем зависимости
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright Browsers
+        run: npx playwright install --with-deps
+
+        # Запускаем тесты
+      - name: Run Playwright tests
+        run: npx playwright test
+
+        # Сохраняем отчет Playwright
+      - uses: actions/upload-artifact@v4
+        if: always()
+        continue-on-error: true
+        with:
+          name: test-results
+          path: test-results
+          retention-days: 30
+
+        # Сохраняем отчет Allure
+      - uses: actions/upload-artifact@v4
+        if: always()
+        continue-on-error: true
+        with:
+          name: allure-results
+          path: allure-results
+          retention-days: 30
+
+        # Забираем результаты предыдущего запуска
+      - uses: actions/checkout@v4
+        if: always()
+        continue-on-error: true
+        with:
+          ref: gh-pages
+          path: gh-pages
+
+        # Создаем Allure отчёт
+      - uses: simple-elf/allure-report-action@master
+        if: always()
+        id: allure-report
+        with:
+          allure_results: allure-results
+          gh_pages: gh-pages
+          allure_report: allure-report
+          allure_history: allure-history
+          keep_reports: 30
+
+        # Деплоим отчет
+      - name: Deploy report
+        if: always()
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_branch: gh-pages
+          publish_dir: ./allure-report
+
+      - name: Notify Telegram
+        if: always()
+        run: |
+          STATUS=${{ job.status }}
+          MESSAGE="🧪 *Playwright Tests завершены*%0A\
+          Статус: *$STATUS*%0A\
+          ✅ Пройдено: *$PASSED*%0A\
+          ❌ Упало: *$FAILED*%0A\
+          ⚠️ Пропущено: *$SKIPPED*%0A\
+          📊 Всего: *$TOTAL*%0A\
+            🔗 [Открыть Allure Report](https://4ddy1.github.io/qaguru_diploma/)"
+            curl -s -X POST https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage \
+            -d chat_id=${{ secrets.TELEGRAM_CHAT_ID }} \
+            -d parse_mode=Markdown \
+            -d text="$MESSAGE"
