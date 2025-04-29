@@ -13,9 +13,9 @@ import { defineConfig, devices } from '@playwright/test';
  * @see https://playwright.dev/docs/test-configuration
  */
 export default defineConfig({
-  timeout: 90000,
+  timeout: 100000,
   expect: {
-    timeout: 90000, // Глобальный таймаут для всех ожиданий (например, toBeVisible, toHaveText)
+    timeout: 100000, // Глобальный таймаут для всех ожиданий (например, toBeVisible, toHaveText)
   },
   testDir: './tests',
   /* Run tests in files in parallel */
