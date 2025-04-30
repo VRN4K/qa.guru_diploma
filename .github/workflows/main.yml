@@ -68,6 +68,21 @@ jobs:
           publish_dir: allure-history
           publish_branch: gh-pages
 
+      - name: Install allurectl
+        run: |
+          curl -o allurectl -L "https://github.com/allure-framework/allurectl/releases/latest/download/allurectl_linux_amd64"
+          chmod +x allurectl
+          sudo mv allurectl /usr/local/bin/
+
+      - name: Upload results to Allure TestOps
+        if: always()
+        run: |
+          allurectl upload allure-results \
+            --endpoint https://allure.autotests.cloud \
+            --project-id 4737 \
+            --token ${{ secrets.ALLURE_TOKEN }} \
+            --launch-name "GitHub Run #${{ github.run_number }}"
+      
       - name: Parse Allure summary
         id: parse_summary
         if: always()
@@ -88,29 +103,14 @@ jobs:
         if: always()
         run: |
           STATUS=${{ job.status }}
-          MESSAGE="🧪 *Playwright Tests завершены*%0A\
+          MESSAGE=" *Прогон тестов завершен*%0A\
           Статус: *$STATUS*%0A\
-          ✅ Пройдено: *$PASSED*%0A\
-          ❌ Упало: *$FAILED*%0A\
+          📈 Всего пройдено: *$TOTAL*%0A\
+          ✅ Успешные: *$PASSED*%0A\
+          🛑 Провалено: *$FAILED*%0A\
           ⚠️ Пропущено: *$SKIPPED*%0A\
-          📊 Всего: *$TOTAL*%0A\
-            🔗 [Открыть Allure Report](https://vrn4k.github.io/qa.guru_diploma/)"
+            ⛓️ [Allure отчет](https://vrn4k.github.io/qa.guru_diploma/)"
             curl -s -X POST https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage \
             -d chat_id=${{ secrets.TELEGRAM_CHAT_ID }} \
             -d parse_mode=Markdown \
             -d text="$MESSAGE"
-      
-      - name: Install allurectl
-        run: |
-          curl -o allurectl -L "https://github.com/allure-framework/allurectl/releases/latest/download/allurectl_linux_amd64"
-          chmod +x allurectl
-          sudo mv allurectl /usr/local/bin/
-
-      - name: Upload results to Allure TestOps
-        if: always()
-        run: |
-          allurectl upload allure-results \
-            --endpoint https://allure.autotests.cloud \
-            --project-id 4737 \
-            --token ${{ secrets.ALLURE_TOKEN }} \
-            --launch-name "GitHub Run #${{ github.run_number }}"
