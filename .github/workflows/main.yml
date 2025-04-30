@@ -68,6 +68,21 @@ jobs:
           publish_dir: allure-history
           publish_branch: gh-pages
 
+      - name: Parse Allure summary
+        id: parse_summary
+        if: always()
+        run: |
+          SUMMARY_FILE="allure-report/widgets/summary.json"
+          if [ -f "$SUMMARY_FILE" ]; then
+            PASSED=$(jq '.statistic.passed' $SUMMARY_FILE)
+            FAILED=$(jq '.statistic.failed' $SUMMARY_FILE)
+            SKIPPED=$(jq '.statistic.skipped' $SUMMARY_FILE)
+            TOTAL=$(jq '.statistic.total' $SUMMARY_FILE)
+            echo "PASSED=$PASSED" >> $GITHUB_ENV
+            echo "FAILED=$FAILED" >> $GITHUB_ENV
+            echo "SKIPPED=$SKIPPED" >> $GITHUB_ENV
+            echo "TOTAL=$TOTAL" >> $GITHUB_ENV
+          fi
       - name: Notify Telegram
         if: always()
         run: |
