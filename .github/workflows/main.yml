@@ -83,6 +83,7 @@ jobs:
             echo "SKIPPED=$SKIPPED" >> $GITHUB_ENV
             echo "TOTAL=$TOTAL" >> $GITHUB_ENV
           fi
+      
       - name: Notify Telegram
         if: always()
         run: |
@@ -98,3 +99,18 @@ jobs:
             -d chat_id=${{ secrets.TELEGRAM_CHAT_ID }} \
             -d parse_mode=Markdown \
             -d text="$MESSAGE"
+      
+      - name: Install allurectl
+        run: |
+          curl -o allurectl -L "https://github.com/allure-framework/allurectl/releases/latest/download/allurectl_linux_amd64"
+          chmod +x allurectl
+          sudo mv allurectl /usr/local/bin/
+
+      - name: Upload results to Allure TestOps
+        if: always()
+        run: |
+          allurectl upload allure-results \
+            --endpoint https://allure.autotests.cloud \
+            --project-id 4717 \
+            --token ${{ secrets.ALLURE_TOKEN }} \
+            --launch-name "GitHub Run #${{ github.run_number }}"
