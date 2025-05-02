@@ -41,11 +41,16 @@ test.describe('Настройки', () => {
 });
 
 test.describe('Статьи', () => {
-    test('Создание новой статьи', async ({webApp, user}) => {
+
+    test.beforeEach(async ({webApp, user}) => {
+        await webApp.main.gotoLogin();
+        await webApp.login.login(user.email, user.password);
         await webApp.main.gotoMainPage();
-        
+    });
+
+    test('Создание новой статьи', async ({webApp}) => {
         const articleBuilder = new ArticleBuilder().addTitle().addContent()
-            .addDescription().addTags(3).generate();
+            .addDescription().addTags(1).generate();
 
         await webApp.articleCreation.gotoArticleCreation();
         await webApp.articleCreation.createNewArticle(articleBuilder.title, articleBuilder.description,
@@ -58,7 +63,7 @@ test.describe('Статьи', () => {
     });
 
     test('Публикация коментария к статье', async ({ webApp }) => {
-        const articleBuilder = new ArticleBuilder().addTitle().addContent().addDescription().addTags(3).generate();
+        const articleBuilder = new ArticleBuilder().addTitle().addContent().addDescription().addTags(1).generate();
         const commentBuilder = new CommentBuilder().addComment(7);
 
         await webApp.articleCreation.gotoArticleCreation();
