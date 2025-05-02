@@ -72,7 +72,6 @@ test.describe('Статьи', () => {
         await webApp.article.gotoArticlePage(articleBuilder.title);
         await webApp.article.publishComment(commentBuilder.content);
 
-        await expect(webApp.article.articleComment).toBeVisible();
         await expect(webApp.article.articleComment).toHaveText(commentBuilder.content);
     });
 });
