@@ -42,7 +42,7 @@ test.describe('Настройки', () => {
 
 test.describe('Статьи', () => {
 
-    test.beforeEach(async ({webApp, user}) => {
+    test.beforeAll(async ({webApp, user}) => {
         await webApp.main.gotoLogin();
         await webApp.login.login(user.email, user.password);
         await webApp.main.gotoMainPage();
