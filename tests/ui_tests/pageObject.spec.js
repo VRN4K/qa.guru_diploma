@@ -41,14 +41,9 @@ test.describe('Настройки', () => {
 });
 
 test.describe('Статьи', () => {
-
-    test.beforeAll(async ({webApp, user}) => {
-        await webApp.main.gotoLogin();
-        await webApp.login.login(user.email, user.password);
+    test('Создание новой статьи', async ({webApp, user}) => {
         await webApp.main.gotoMainPage();
-    });
-
-    test('Создание новой статьи', async ({webApp}) => {
+        
         const articleBuilder = new ArticleBuilder().addTitle().addContent()
             .addDescription().addTags(3).generate();
 
