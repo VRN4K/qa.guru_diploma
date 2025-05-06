@@ -1,35 +1,48 @@
-import endpoints from "../services/endpoints";
-
 export class TodosController {
     constructor(api) {
         this.api = api;
     }
 
     async getAllTodos() {
-        return await this.api.get(endpoints.getAllToDo);
+        return await this.api.get('/todos');
     }
 
     async getTodoById(todoId) {
-        return await this.api.get(endpoints.getToDoById(todoId))
+        return await this.api.get(`/todos/${todoId}`)
     }
 
     async getDoneTodos() {
-        return await this.api.get(endpoints.getFilteredTodoByDoneStatus);
+        return await this.api.get('/todos?doneStatus=true');
     }
 
-    async postTodo(payload) {
-        return await this.api.post(endpoints.getAllToDo, payload);
+    async postTodo(todo) {
+        const payload = {
+            "title": `${todo.title}`,
+            "doneStatus": Boolean(todo.doneStatus),
+            "description": `${todo.description}`
+        }
+        return await this.api.post('/todos', payload);
     }
 
-    async postTodoById(id, payload) {
-        return await this.api.post(endpoints.updateOrDeleteById(id), payload)
+    async postTodoById(todo) {
+        const payload = {
+            "description": `${todo.description}`
+        }
+        return await this.api.post(`/todos/${todo.id}`, payload)
     }
 
-    async putTodo(id, payload) {
-        return await this.api.put(endpoints.getToDoById(id), payload);
+    async putTodo(todo){
+        const payload = {
+            "id": Number(todo.id),
+            "title": `${todo.title}`,
+            "doneStatus": Boolean(todo.doneStatus),
+            "description": `${todo.description}`
+        }
+
+        return await this.api.put(`/todos/${todo.id}`, payload);
     }
 
-    async deleteTodosById(id) {
-        return await this.api.delete(endpoints.updateOrDeleteById(id));
+    async deleteTodosById(todoId) {
+        return await this.api.delete(`/todos/${todoId}`);
     }
 }

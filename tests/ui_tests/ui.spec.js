@@ -2,8 +2,6 @@ import {expect} from '@playwright/test';
 import {test} from '../../src/helpers/fixtures/ui.fixtures';
 import {ArticleBuilder, CommentBuilder, UserBuilder} from "../../src/helpers/builders";
 
-test.use({storageState: {cookies: [], origins: []}});
-
 test.describe('Настройки', () => {
 
     test('Зарегистрировать нового пользователя', async ({webApp}) => {
@@ -64,7 +62,7 @@ test.describe('Статьи', () => {
 
     test('Публикация коментария к статье', async ({ webApp }) => {
         const articleBuilder = new ArticleBuilder().addTitle().addContent().addDescription().addTags(1).generate();
-        const commentBuilder = new CommentBuilder().addComment(7);
+        const commentBuilder = new CommentBuilder().addComment(7).generate();
 
         await webApp.articleCreation.gotoArticleCreation();
         await webApp.articleCreation.createNewArticle(articleBuilder.title, articleBuilder.description, articleBuilder.content, articleBuilder.tags);

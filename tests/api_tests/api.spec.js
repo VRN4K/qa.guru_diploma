@@ -1,10 +1,8 @@
 import {test, expect} from '@playwright/test';
-import {ChallengesApi} from "../../src/services/index";
-import payloads from "../../src/services/payloads";
 import {TodoBuilder} from "../../src/helpers/builders/todo.builder";
-import {ChallengesController, TodosController} from "../../src/controllers";
+import {ChallengesApi, ChallengesController, TodosController,} from "../../src/controllers/index";
 
-const URL = 'https://apichallenges.herokuapp.com/';
+const URL = 'https://apichallenges.herokuapp.com';
 
 test.describe('API-тесты для работы с задачами', () => {
     let api = new ChallengesApi(URL);
@@ -25,8 +23,7 @@ test.describe('API-тесты для работы с задачами', () => {
         {tag: '@post'},
         async () => {
             const newTodo = new TodoBuilder().addTitle().addDoneStatus(true).addDescription().generate()
-            const postPayload = payloads.newToDoPayload(newTodo.title, newTodo.doneStatus, newTodo.description);
-            const response = await todosController.postTodo(postPayload)
+            const response = await todosController.postTodo(newTodo)
             const todo = await response.json();
 
             createdToDoId = todo.id;
@@ -71,23 +68,20 @@ test.describe('API-тесты для работы с задачами', () => {
     test('Обновить описание задачи по id POST /todos/{id} (200)',
         {tag: '@post'},
         async () => {
-            const newDescription = new TodoBuilder().addDescription().generate().description;
+            const newTodoWithDescription = new TodoBuilder().addId(createdToDoId).addDescription().generate();
 
-            const postPayload = payloads.updateDescriptionPayload(newDescription);
-            const response = await todosController.postTodoById(createdToDoId , postPayload);
+            const response = await todosController.postTodoById(newTodoWithDescription);
             const responseBody = await response.json();
 
             expect(response.status).toBe(200);
-            expect(responseBody.description).toBe(newDescription);
+            expect(responseBody.description).toBe(newTodoWithDescription.description);
         });
 
     test('Обновить все поля задачи PUT /todos/{id} full (200)',
         {tag: '@put'},
         async () => {
-            const newTodoContent = new TodoBuilder().addTitle().addDoneStatus(true).addDescription().generate()
-
-            const postPayload = payloads.updatePayload(createdToDoId, newTodoContent.title, newTodoContent.doneStatus, newTodoContent.description);
-            const response = await todosController.putTodo(createdToDoId, postPayload);
+            const newTodoContent = new TodoBuilder().addId(createdToDoId).addTitle().addDoneStatus(true).addDescription().generate()
+            const response = await todosController.putTodo(newTodoContent);
             const responseBody = await response.json();
 
             expect(response.status).toBe(200);
@@ -102,6 +96,5 @@ test.describe('API-тесты для работы с задачами', () => {
             const response = await todosController.deleteTodosById(createdToDoId);
             expect(response.status).toBe(200)
         });
-
 })
 

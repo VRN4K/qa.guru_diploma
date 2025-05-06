@@ -1,6 +1,6 @@
 import { test as base } from '@playwright/test';
 import {App} from "../../pages/app.page";
-import {UserBuilder} from "../builders";
+import {UserBuilder} from "../builders/index";
 
 
 export const test = base.extend({
