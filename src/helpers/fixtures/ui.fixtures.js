@@ -4,7 +4,7 @@ import {UserBuilder} from "../builders/index";
 
 
 export const test = base.extend({
-    webApp: async ({ page }, use) => {
+    webApp: async ({page}, use) => {
         const app = new App(page);
         await app.main.gotoMainPage();
         await use(app);

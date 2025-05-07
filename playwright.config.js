@@ -17,6 +17,7 @@ export default defineConfig({
   expect: {
     timeout: 50000, // Глобальный таймаут для всех ожиданий (например, toBeVisible, toHaveText)
   },
+
   testDir: './tests',
   /* Run tests in files in parallel */
   fullyParallel: true,
@@ -32,11 +33,11 @@ export default defineConfig({
   use: {
     /* Base URL to use in actions like `await page.goto('/')`. */
     // baseURL: 'http://127.0.0.1:3000',
+    baseURL: 'https://apichallenges.herokuapp.com',
 
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: 'on-first-retry',
   },
-
   /* Configure projects for major browsers */
   projects: [
     {
