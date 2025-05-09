@@ -2,8 +2,10 @@ import {test, expect} from '@playwright/test';
 import {TodoBuilder} from "../../src/helpers/builders/todo.builder";
 import {ChallengesApi, ChallengesController, TodosController,} from "../../src/controllers/index";
 
+const URL = 'https://apichallenges.herokuapp.com';
+
 test.describe('API-тесты для работы с задачами', () => {
-    let api = new ChallengesApi('.');
+    let api = new ChallengesApi(URL);
     let challengesController = new ChallengesController(api);
     let todosController = new TodosController(api);
     let createdToDoId;
